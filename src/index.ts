@@ -1,13 +1,32 @@
-import express, { Express } from 'express';
-import dotenv from 'dotenv';
+console.log("App starting...");
 
-dotenv.config();
+import express, { Request, Response, NextFunction } from 'express';
+import bodyParser from 'body-parser';
+import reportsRoutes from './routes/reports';
+import projectRoutes from './routes/projectsRoutes';
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+const app = express();
+const PORT = 3000;
 
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.listen(port, () => {
-	console.log(`[server]: Server is running at http://localhost:${port}`);
+const API_PASSWORD = "password123";
+
+const passwordAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+
+  const password = req.headers['x-api-password'] as string | undefined;
+
+  if (password && password === API_PASSWORD) {
+    next(); 
+  } else {
+    res.status(403).json({ message: 'Access denied: Invalid password' });
+  }
+};
+
+app.use('/api', passwordAuthMiddleware,reportsRoutes);
+app.use('/api',passwordAuthMiddleware,projectRoutes); 
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+export default app;
