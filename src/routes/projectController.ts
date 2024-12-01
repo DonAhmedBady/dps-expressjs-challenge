@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from '../services/db.service';
-import { Project, Report } from '../models/model';
+import { Project } from '../models/model';
 
 // CREATE a new project
 export const createProject = async (req: Request, res: Response) => {
